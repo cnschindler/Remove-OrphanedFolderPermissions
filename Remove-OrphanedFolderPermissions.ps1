@@ -72,10 +72,10 @@ foreach ($mbx in $mbxs)
     $folders = $folders | Where-Object Containerclass -notlike "IPF.Contact.*"
     $folders = $folders | Where-Object Containerclass -ne "IPF.Note.OutlookHomepage"
     $folders = $folders | Where-Object Containerclass -ne "IPF.Note.SocialConnector.FeedItems"
-
+    $Address = $mbx.WindowsEmailAddress.ToString()
+    
         foreach ($folder in $folders)
     {
-        $Address = $mbx.WindowsEmailAddress.ToString()
         $parentfolder = $folder.FolderPath.Split("/")[1]
         $fperms = Get-MailboxFolderPermission -Identity ($Address + ":" + $folder.FolderId)
 
@@ -148,6 +148,6 @@ foreach ($mbx in $mbxs)
 
     if ($AffectedMBX)
     {
-        Add-Content -Value $mbx.WindowsEmailAddress.ToString() -Path $CSVFullPath
+        Add-Content -Value $Address -Path $CSVFullPath
     }
 }
