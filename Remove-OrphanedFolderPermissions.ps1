@@ -59,8 +59,7 @@ function Write-LogFile
 
 $mbxs = Get-Mailbox -resultsize unlimited
 
-$AffectedMBXs = @()
-$AffectedMBXs += "EmailAddress"
+Set-Content -Value "EmailAddress" -Path $CSVFullPath
 
 foreach ($mbx in $mbxs)
 {
@@ -149,8 +148,6 @@ foreach ($mbx in $mbxs)
 
     if ($AffectedMBX)
     {
-        $AffectedMBXs+= $mbx.WindowsEmailAddress.ToString()
+        Add-Content -Value $mbx.WindowsEmailAddress.ToString() -Path $CSVFullPath
     }
 }
-
-$AffectedMBXs | Out-File -FilePath $CSVFullPath
