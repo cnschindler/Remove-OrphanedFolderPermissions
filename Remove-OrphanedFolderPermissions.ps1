@@ -2,7 +2,8 @@
 Param(
 [Parameter(Mandatory=$true)]
 [string]$BasePath,
-[switch]$RemoveOrphanedPermissions
+[switch]$RemoveOrphanedPermissions,
+[string]$MailboxFile
 )
 
 . 'C:\Program Files\Microsoft\Exchange Server\V15\bin\RemoteExchange.ps1'
@@ -57,15 +58,26 @@ function Write-LogFile
     }
 }
 
-$mbxs = Get-Mailbox -resultsize unlimited
+if ($MailboxFile -like "*")
+{
+    $mbxs = Import-Csv -Path $MailboxFile
+}
+
+else
+{
+    $mbxs = Get-Mailbox -resultsize unlimited    
+}
 
 Set-Content -Value "EmailAddress" -Path $CSVFullPath
 
 foreach ($mbx in $mbxs)
 {
+    $AffectedMBX = $false
+
     $Message = "$($mbx.Name): Processing Mailbox"
     Write-Host -ForegroundColor Green -Object $Message
     Write-LogFile -Message $Message
+
     $folders = Get-MailboxFolderStatistics -Identity $mbx | Where-Object Containerclass -like "IPF.*"
     $folders = $folders | where-object Folderpath -ne "/Top of Information Store"
     $folders = $folders | Where-Object Containerclass -ne "IPF.Configuration"
@@ -146,7 +158,7 @@ foreach ($mbx in $mbxs)
         }
     }
 
-    if ($AffectedMBX)
+    if ($AffectedMBX -eq $true)
     {
         Add-Content -Value $Address -Path $CSVFullPath
     }
