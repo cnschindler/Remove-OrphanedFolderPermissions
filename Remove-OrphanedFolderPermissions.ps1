@@ -1,15 +1,20 @@
 ﻿[cmdletbinding()]
+#
 Param(
 [Parameter(Mandatory=$true)]
-[string]$BasePath,
+[Parameter(ParameterSetName="Detect")]
+[System.IO.DirectoryInfo]$BasePath,
+[Parameter(ParameterSetName="Remove")]
 [switch]$RemoveOrphanedPermissions,
-[string]$MailboxFile
+[Parameter(ParameterSetName="Remove")]
+[System.IO.FileInfo]$AffectedMailboxesFile
 )
 
 . 'C:\Program Files\Microsoft\Exchange Server\V15\bin\RemoteExchange.ps1'
 Connect-ExchangeServer -auto -ClientApplication:ManagementShell
 
-[string]$LogPath = Join-Path -Path $BasePath -ChildPath "Remove-OrphanedPermissions"
+$LogFolderName = "Remove-OrphanedPermissions"
+[string]$LogPath = Join-Path -Path $BasePath -ChildPath $LogFolderName
 [string]$LogfileFullPath = Join-Path -Path $LogPath -ChildPath ("RemoveOrphanedPermissions_{0:yyyyMMdd-HHmmss}.log" -f [DateTime]::Now)
 $Script:NoLogging
 [string]$CSVFullPath = Join-Path -Path $LogPath -ChildPath ("AffectedMailboxes_{0:yyyyMMdd-HHmmss}.txt" -f [DateTime]::Now)
@@ -58,7 +63,7 @@ function Write-LogFile
     }
 }
 
-if ($MailboxFile -like "*")
+if ($AffectedMailboxesFile -like "*")
 {
     $mbxs = Import-Csv -Path $MailboxFile
 }
