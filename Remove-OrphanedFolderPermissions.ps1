@@ -1,5 +1,4 @@
 ﻿[cmdletbinding()]
-##
 Param(
 [Parameter(Mandatory=$true)]
 [Parameter(ParameterSetName="Detect")]
